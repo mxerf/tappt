@@ -28,7 +28,7 @@ jobs:
       # changesets shells out to `npm publish` internally, so we need a recent
       # npm CLI for automatic OIDC exchange with the npm Trusted Publisher.
       - name: Use latest npm CLI
-        run: npm install -g npm@latest
+        run: sudo npm install -g npm@latest
 
       - run: bun install --frozen-lockfile
 
