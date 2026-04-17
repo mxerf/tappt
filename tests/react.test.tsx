@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { act } from "react";
+import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { TapptProvider, useHaptic } from "../src/react";
 import { createHaptic } from "../src/core/haplib";
@@ -60,6 +60,30 @@ describe("React adapter", () => {
       </TapptProvider>,
     );
     expect(tg.impact).toHaveBeenCalledTimes(1);
+    act(() => root.unmount());
+  });
+
+  it("survives React StrictMode double-invoke (cleanup + remount)", () => {
+    const tg = mockTelegramWebApp();
+    const captured: Array<ReturnType<typeof useHaptic>> = [];
+    function Probe() {
+      captured.push(useHaptic());
+      return null;
+    }
+    const { root } = render(
+      <StrictMode>
+        <TapptProvider>
+          <Probe />
+        </TapptProvider>
+      </StrictMode>,
+    );
+    // StrictMode renders twice; the *last* captured instance is what React
+    // actually commits for this pass. It must be usable, not a destroyed
+    // zombie from the first render's cleanup.
+    const last = captured[captured.length - 1]!;
+    expect(last.isSupported()).toBe(true);
+    last.impact("medium");
+    expect(tg.impact).toHaveBeenLastCalledWith("medium");
     act(() => root.unmount());
   });
 });

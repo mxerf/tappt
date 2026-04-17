@@ -9,12 +9,20 @@ function hasSwitchAttribute(): boolean {
   return "switch" in proto;
 }
 
+function randomSuffix(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const bytes = crypto.getRandomValues(new Uint8Array(8));
+    return Array.from(bytes, (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 10);
+  }
+  return Math.random().toString(36).slice(2, 12);
+}
+
 function createRig(): IosRig | null {
   try {
     const input = document.createElement("input");
     input.type = "checkbox";
     input.setAttribute("switch", "");
-    input.id = `__haplib_switch_${Math.random().toString(36).slice(2, 8)}__`;
+    input.id = `__haplib_switch_${randomSuffix()}__`;
     input.style.cssText =
       "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;";
     input.setAttribute("aria-hidden", "true");

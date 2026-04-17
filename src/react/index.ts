@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useMemo, useRef, useEffect } from "react";
+import { createContext, createElement, useContext, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
 import { createHaptic, haptic as sharedHaptic } from "../core/haplib";
 import type { Haptic, HapticOptions } from "../core/types";
@@ -15,27 +15,39 @@ export interface TapptProviderProps {
 /**
  * Provides a haptic instance scoped to the subtree. Without it, `useHaptic`
  * falls back to the shared module-level instance.
+ *
+ * The instance lives in a ref with lazy init. We defer destroy() to a
+ * microtask and cancel it on the next mount, so React 18+ strict-mode's
+ * cleanup-then-remount pattern doesn't leave the Context pointing at a
+ * destroyed instance.
  */
 export function TapptProvider(props: TapptProviderProps) {
   const { options, haptic: injected, children } = props;
-  const ownedRef = useRef<Haptic | null>(null);
+  const instanceRef = useRef<Haptic | null>(null);
+  const destroyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const instance = useMemo<Haptic>(() => {
-    if (injected) return injected;
-    if (!ownedRef.current) ownedRef.current = createHaptic(options);
-    return ownedRef.current;
-  }, [injected, options]);
+  if (!instanceRef.current) {
+    instanceRef.current = injected ?? createHaptic(options);
+  }
 
   useEffect(() => {
+    if (destroyTimerRef.current !== null) {
+      clearTimeout(destroyTimerRef.current);
+      destroyTimerRef.current = null;
+    }
     return () => {
-      if (ownedRef.current && !injected) {
-        ownedRef.current.destroy();
-        ownedRef.current = null;
-      }
+      if (injected) return;
+      destroyTimerRef.current = setTimeout(() => {
+        if (instanceRef.current) {
+          instanceRef.current.destroy();
+          instanceRef.current = null;
+        }
+        destroyTimerRef.current = null;
+      }, 0);
     };
   }, [injected]);
 
-  return createElement(HapticContext.Provider, { value: instance }, children);
+  return createElement(HapticContext.Provider, { value: instanceRef.current }, children);
 }
 
 /**

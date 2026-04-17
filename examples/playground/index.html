@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <title>tappt — haptic feedback playground</title>
+    <meta name="description" content="Try @mxerf/tappt haptic feedback on your phone. Works in Telegram Mini Apps, iOS Safari 17.4+, and Android via the Vibration API." />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>tappt</h1>
+        <p class="tagline">Tiny, SSR-safe haptic feedback for the web.</p>
+        <nav class="links">
+          <a href="https://www.npmjs.com/package/@mxerf/tappt" target="_blank" rel="noopener">npm</a>
+          <span class="sep">·</span>
+          <a href="https://github.com/mxerf/tappt" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+      </header>
+
+      <section class="status" id="status">
+        <div class="row"><span>Active backend</span><strong id="backend">…</strong></div>
+        <div class="row"><span>Package</span><strong id="version">@mxerf/tappt@…</strong></div>
+        <div class="row"><span>Telegram WebApp</span><strong id="has-tg">…</strong></div>
+        <div class="row"><span>iOS switch element</span><strong id="has-switch">…</strong></div>
+        <div class="row"><span>navigator.vibrate</span><strong id="has-vibrate">…</strong></div>
+      </section>
+
+      <section>
+        <h2>Impact</h2>
+        <p class="hint">Short taps — great for buttons, toggles, drag endpoints.</p>
+        <div class="buttons">
+          <button data-kind="impact" data-style="light">Light</button>
+          <button data-kind="impact" data-style="medium">Medium</button>
+          <button data-kind="impact" data-style="heavy">Heavy</button>
+          <button data-kind="impact" data-style="rigid">Rigid</button>
+          <button data-kind="impact" data-style="soft">Soft</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Notification</h2>
+        <p class="hint">Event feedback — form success, errors, warnings.</p>
+        <div class="buttons">
+          <button data-kind="notify" data-type="success">Success</button>
+          <button data-kind="notify" data-type="warning">Warning</button>
+          <button data-kind="notify" data-type="error">Error</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Selection</h2>
+        <p class="hint">Very light tap — tab switches, picker steps.</p>
+        <div class="buttons">
+          <button data-kind="selection">Selection</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Install</h2>
+        <pre><code>bun add @mxerf/tappt</code></pre>
+      </section>
+
+      <footer>
+        <p>Open this page on a real phone for actual haptics.</p>
+        <p class="muted">Best results inside Telegram Mini App or iOS Safari 17.4+.</p>
+      </footer>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

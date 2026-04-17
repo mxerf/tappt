@@ -1,5 +1,7 @@
 # tappt
 
+> [Читать на русском](./README.ru.md)
+
 Tiny, SSR-safe haptic feedback for the web. Works in **Telegram Mini Apps**, **iOS Safari 17.4+** (via the Taptic Engine "switch" hack), and anywhere the **Vibration API** is available. Silent no-op on unsupported platforms.
 
 - ~1.4 KB min+gzip core, zero runtime dependencies
@@ -13,7 +15,7 @@ Tiny, SSR-safe haptic feedback for the web. Works in **Telegram Mini Apps**, **i
 Browsers give you fragmented options for haptic feedback:
 
 1. **Telegram Mini Apps** expose `window.Telegram.WebApp.HapticFeedback` with a full `impact / notification / selection` API.
-2. **iOS Safari 17.4+** gained the [`<input type="checkbox" switch>`](https://webkit.org/blog/15132/meet-safari-17-4/) element, which produces a real Taptic Engine pulse when toggled — the only way to trigger native haptics on iOS PWAs. There is no public API for this; `navigator.vibrate` is not implemented on iOS.
+2. **iOS Safari 17.4+** gained the [`<input type="checkbox" switch>`](https://webkit.org/blog/15063/webkit-features-in-safari-17-4/) element, which produces a real Taptic Engine pulse when toggled — the only way to trigger native haptics on iOS PWAs. There is no public API for this; `navigator.vibrate` is not implemented on iOS.
 3. **Android and other browsers** expose `navigator.vibrate(pattern)`.
 
 `tappt` picks the best available backend at runtime and gives you a single, stable API.
