@@ -16,6 +16,14 @@
   ],
   "author": "mxerf",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mxerf/haplib.git"
+  },
+  "homepage": "https://github.com/mxerf/haplib#readme",
+  "bugs": {
+    "url": "https://github.com/mxerf/haplib/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [
