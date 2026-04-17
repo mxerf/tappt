@@ -58,15 +58,15 @@ const DICT = {
     "env.backend": "Активный бэкенд",
     "env.version": "Пакет",
     "env.tg": "Telegram Mini App",
-    "env.switch": "iOS switch-элемент",
+    "env.switch": "Элемент switch в iOS",
     "env.vibrate": "navigator.vibrate",
-    "section.try": "Попробуй",
-    "try.hint": "Открой на телефоне — это настоящие пульсы железа, а не звук.",
+    "section.try": "Попробовать",
+    "try.hint": "Открой на телефоне — это настоящая вибрация, а не звуковая имитация.",
     "group.impact": "короткий тап",
-    "group.notify": "событийная отдача",
+    "group.notify": "отклик на событие",
     "group.selection": "лёгкий тап",
     "impact.note":
-      "В iOS Safari все стили impact дают одинаковый пульс — элемент <input type=\"checkbox\" switch> поддерживает только один вид Taptic. Внутри Telegram и на Android все пять различаются.",
+      "В iOS Safari все стили impact дают один и тот же пульс: элемент <input type=\"checkbox\" switch> поддерживает только один вид Taptic. В Telegram и на Android все пять стилей различимы.",
     "section.install": "Установка",
     "copy.idle": "Копировать",
     "copy.done": "Скопировано",
@@ -74,35 +74,35 @@ const DICT = {
     "section.api": "API",
     "api.snippet":
       'import { haptic } from "@mxerf/tappt";\n\nhaptic.impact("medium");\nhaptic.notify("success");\nhaptic.selection();',
-    "api.impact": "короткий тап — кнопки, тумблеры, концы drag-жестов",
-    "api.notify": "событийная отдача — успех/ошибка/предупреждение",
+    "api.impact": "короткий тап — кнопки, тумблеры, конец drag-жеста",
+    "api.notify": "отклик на событие — успех, предупреждение, ошибка",
     "api.selection": "очень лёгкий тап — вкладки, шаги пикера",
-    "api.trigger": "отправить discriminated HapticEvent",
-    "api.getBackend": "какой бэкенд активен",
-    "api.isSupported": "true, если есть работающий бэкенд",
-    "api.destroy": "освободить DOM-rig и внутреннее состояние",
+    "api.trigger": "отправить HapticEvent (discriminated union)",
+    "api.getBackend": "какой бэкенд сейчас активен",
+    "api.isSupported": "true, если хоть один бэкенд работает",
+    "api.destroy": "освободить DOM-элементы и внутреннее состояние",
     "section.backends": "Приоритет бэкендов",
     "backends.hint":
-      "При первом вызове tappt берёт первый доступный из списка:",
+      "При первом вызове tappt выбирает первый доступный из списка:",
     "backend.telegram":
-      "Нативный мост через window.Telegram.WebApp.HapticFeedback внутри реального TG Mini App",
+      "Нативный API window.Telegram.WebApp.HapticFeedback — когда страница запущена в реальном Telegram Mini App",
     "backend.iosSwitch":
-      "Скрытый <input type=\"checkbox\" switch>, только iOS Safari 17.4+",
+      "Скрытый <input type=\"checkbox\" switch>, работает только в iOS Safari 17.4+",
     "backend.vibration":
       "navigator.vibrate(pattern) — Android и большинство десктопных браузеров",
     "backend.noop":
-      "Тихий fallback — старые iOS, изолированные браузеры, SSR",
+      "Тихий fallback — старые iOS, браузеры с ограничениями, SSR",
     "section.limits": "Известные ограничения",
     "limit.iosImpact":
       "iOS Safari не различает стили impact — все пять ощущаются одинаково.",
     "limit.androidVary":
-      "Поведение Vibration API сильно отличается от устройства к устройству; не закладывай смысл в небольшие различия длительности.",
+      "Поведение Vibration API сильно отличается от устройства к устройству, не полагайся на тонкие различия длительности.",
     "limit.notifyQueue":
-      "notify() на iOS эмулируется повторяющимися пульсами с паузой 55 мс; перекрывающиеся вызовы сериализуются внутренней очередью.",
+      "На iOS notify() эмулируется серией пульсов с паузой 55 мс. Вызовы, идущие подряд, ставятся в очередь и не накладываются друг на друга.",
     "limit.userGesture":
-      "navigator.vibrate требует реального user gesture — вызывай haptic из click/touch обработчиков.",
-    "footer.touch": "Открой эту страницу на настоящем телефоне — будут настоящие haptics.",
-    "footer.best": "Лучше всего — внутри Telegram Mini App или в iOS Safari 17.4+.",
+      "navigator.vibrate срабатывает только в ответ на действие пользователя — вызывай haptic из обработчиков click/touch.",
+    "footer.touch": "Чтобы почувствовать вибрацию, открой страницу на реальном телефоне.",
+    "footer.best": "Лучше всего работает в Telegram Mini App или iOS Safari 17.4+.",
   },
 };
 
