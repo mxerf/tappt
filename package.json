@@ -18,11 +18,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mxerf/haplib.git"
+    "url": "git+https://github.com/mxerf/tappt.git"
   },
-  "homepage": "https://github.com/mxerf/haplib#readme",
+  "homepage": "https://github.com/mxerf/tappt#readme",
   "bugs": {
-    "url": "https://github.com/mxerf/haplib/issues"
+    "url": "https://github.com/mxerf/tappt/issues"
   },
   "type": "module",
   "sideEffects": false,
