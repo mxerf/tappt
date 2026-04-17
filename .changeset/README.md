@@ -1,6 +1,6 @@
 # Changesets
 
-`haplib` uses [changesets](https://github.com/changesets/changesets) to manage releases.
+`tappt` uses [changesets](https://github.com/changesets/changesets) to manage releases.
 
 ## Adding a change
 

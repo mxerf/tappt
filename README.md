@@ -1,4 +1,4 @@
-# haplib
+# tappt
 
 Tiny, SSR-safe haptic feedback for the web. Works in **Telegram Mini Apps**, **iOS Safari 17.4+** (via the Taptic Engine "switch" hack), and anywhere the **Vibration API** is available. Silent no-op on unsupported platforms.
 
@@ -16,26 +16,26 @@ Browsers give you fragmented options for haptic feedback:
 2. **iOS Safari 17.4+** gained the [`<input type="checkbox" switch>`](https://webkit.org/blog/15132/meet-safari-17-4/) element, which produces a real Taptic Engine pulse when toggled — the only way to trigger native haptics on iOS PWAs. There is no public API for this; `navigator.vibrate` is not implemented on iOS.
 3. **Android and other browsers** expose `navigator.vibrate(pattern)`.
 
-`haplib` picks the best available backend at runtime and gives you a single, stable API.
+`tappt` picks the best available backend at runtime and gives you a single, stable API.
 
 ## Install
 
 ```sh
-bun add haplib
+bun add tappt
 # or
-npm i haplib
+npm i tappt
 # or
-pnpm add haplib
+pnpm add tappt
 ```
 
-React and Vue are declared as **optional peer dependencies** — you only need them installed if you import `haplib/react` or `haplib/vue`.
+React and Vue are declared as **optional peer dependencies** — you only need them installed if you import `tappt/react` or `tappt/vue`.
 
 ## Usage
 
 ### Vanilla
 
 ```ts
-import { haptic } from "haplib";
+import { haptic } from "tappt";
 
 button.addEventListener("click", () => haptic.impact("medium"));
 form.addEventListener("submit", () => haptic.notify("success"));
@@ -45,7 +45,7 @@ tabs.addEventListener("change", () => haptic.selection());
 Or use the named functions directly:
 
 ```ts
-import { impact, notify, selection } from "haplib";
+import { impact, notify, selection } from "tappt";
 
 impact("light");
 notify("error");
@@ -57,7 +57,7 @@ selection();
 Useful when you want to pass the haptic intent through component props:
 
 ```ts
-import { trigger, type HapticEvent } from "haplib";
+import { trigger, type HapticEvent } from "tappt";
 
 function handleAction(event: HapticEvent) {
   trigger(event);
@@ -73,7 +73,7 @@ handleAction({ kind: "selection" });
 For tests, per-feature opt-outs, or forced backends:
 
 ```ts
-import { createHaptic } from "haplib";
+import { createHaptic } from "tappt";
 
 const haptic = createHaptic({
   backend: "vibration", // force a specific backend
@@ -87,7 +87,7 @@ haptic.destroy(); // releases the iOS rig and internal state
 ### React
 
 ```tsx
-import { useHaptic, HaplibProvider } from "haplib/react";
+import { useHaptic, TapptProvider } from "tappt/react";
 
 function LikeButton() {
   const haptic = useHaptic();
@@ -97,9 +97,9 @@ function LikeButton() {
 // Optional: scope a haptic instance to a subtree
 export function App() {
   return (
-    <HaplibProvider options={{ disabled: userPrefersNoHaptics }}>
+    <TapptProvider options={{ disabled: userPrefersNoHaptics }}>
       <LikeButton />
-    </HaplibProvider>
+    </TapptProvider>
   );
 }
 ```
@@ -110,7 +110,7 @@ Without a provider, `useHaptic()` returns a shared module-level singleton — ze
 
 ```vue
 <script setup lang="ts">
-import { useHaptic } from "haplib/vue";
+import { useHaptic } from "tappt/vue";
 
 const haptic = useHaptic();
 </script>
@@ -124,9 +124,9 @@ Install as a plugin to inject an app-wide instance:
 
 ```ts
 import { createApp } from "vue";
-import { haplibPlugin } from "haplib/vue";
+import { tapptPlugin } from "tappt/vue";
 
-createApp(App).use(haplibPlugin({ disabled: false })).mount("#app");
+createApp(App).use(tapptPlugin({ disabled: false })).mount("#app");
 ```
 
 Or create a component-scoped instance that auto-destroys on unmount:
@@ -173,7 +173,7 @@ createHaptic({
 
 ## Backend priority
 
-On first use, `haplib` picks the first available backend from this list:
+On first use, `tappt` picks the first available backend from this list:
 
 1. **`telegram`** — `window.Telegram.WebApp.HapticFeedback`. Best quality inside Telegram clients.
 2. **`ios-switch`** — hidden `<input type="checkbox" switch>` element. iOS 17.4+ Safari only.

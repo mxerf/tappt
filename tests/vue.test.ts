@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createApp, defineComponent, h } from "vue";
-import { haplibPlugin, useHaptic } from "../src/vue";
+import { tapptPlugin, useHaptic } from "../src/vue";
 import { mockTelegramWebApp, resetHapticState } from "./helpers";
 
 beforeEach(() => resetHapticState());
@@ -25,7 +25,7 @@ describe("Vue adapter", () => {
     app.unmount();
   });
 
-  it("haplibPlugin provides an instance via inject", () => {
+  it("tapptPlugin provides an instance via inject", () => {
     const tg = mockTelegramWebApp();
     let captured: ReturnType<typeof useHaptic> | null = null;
     const Probe = defineComponent({
@@ -37,7 +37,7 @@ describe("Vue adapter", () => {
     const app = createApp({
       render: () => h(Probe),
     });
-    app.use(haplibPlugin());
+    app.use(tapptPlugin());
     const el = document.createElement("div");
     document.body.appendChild(el);
     app.mount(el);

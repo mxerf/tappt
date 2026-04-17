@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { HaplibProvider, useHaptic } from "../src/react";
+import { TapptProvider, useHaptic } from "../src/react";
 import { createHaptic } from "../src/core/haplib";
 import { mockTelegramWebApp, resetHapticState } from "./helpers";
 
@@ -30,7 +30,7 @@ describe("React adapter", () => {
     act(() => root.unmount());
   });
 
-  it("HaplibProvider injects a scoped haptic instance", () => {
+  it("TapptProvider injects a scoped haptic instance", () => {
     mockTelegramWebApp();
     const injected = createHaptic({ disabled: true });
     let captured: ReturnType<typeof useHaptic> | null = null;
@@ -39,15 +39,15 @@ describe("React adapter", () => {
       return null;
     }
     const { root } = render(
-      <HaplibProvider haptic={injected}>
+      <TapptProvider haptic={injected}>
         <Probe />
-      </HaplibProvider>,
+      </TapptProvider>,
     );
     expect(captured).toBe(injected);
     act(() => root.unmount());
   });
 
-  it("HaplibProvider destroys an owned instance on unmount", () => {
+  it("TapptProvider destroys an owned instance on unmount", () => {
     const tg = mockTelegramWebApp();
     function Probe() {
       const h = useHaptic();
@@ -55,9 +55,9 @@ describe("React adapter", () => {
       return null;
     }
     const { root } = render(
-      <HaplibProvider>
+      <TapptProvider>
         <Probe />
-      </HaplibProvider>,
+      </TapptProvider>,
     );
     expect(tg.impact).toHaveBeenCalledTimes(1);
     act(() => root.unmount());

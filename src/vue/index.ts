@@ -3,14 +3,14 @@ import type { App, InjectionKey } from "vue";
 import { createHaptic, haptic as sharedHaptic } from "../core/haplib";
 import type { Haptic, HapticOptions } from "../core/types";
 
-export const HapticKey: InjectionKey<Haptic> = Symbol("haplib:haptic");
+export const HapticKey: InjectionKey<Haptic> = Symbol("tappt:haptic");
 
 /**
  * Install a haptic instance on a Vue app. Components inside can access it
  * via `useHaptic()`. Without installing, `useHaptic()` falls back to the
  * shared singleton.
  */
-export function haplibPlugin(options?: HapticOptions) {
+export function tapptPlugin(options?: HapticOptions) {
   return {
     install(app: App) {
       const instance = createHaptic(options);

@@ -5,7 +5,7 @@ import type { Haptic, HapticOptions } from "../core/types";
 
 const HapticContext = createContext<Haptic | null>(null);
 
-export interface HaplibProviderProps {
+export interface TapptProviderProps {
   options?: HapticOptions;
   /** Provide an already-constructed haptic instance (e.g. from tests). */
   haptic?: Haptic;
@@ -16,7 +16,7 @@ export interface HaplibProviderProps {
  * Provides a haptic instance scoped to the subtree. Without it, `useHaptic`
  * falls back to the shared module-level instance.
  */
-export function HaplibProvider(props: HaplibProviderProps) {
+export function TapptProvider(props: TapptProviderProps) {
   const { options, haptic: injected, children } = props;
   const ownedRef = useRef<Haptic | null>(null);
 
