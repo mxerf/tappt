@@ -21,11 +21,11 @@ Browsers give you fragmented options for haptic feedback:
 ## Install
 
 ```sh
-bun add tappt
+bun add @mxerf/tappt
 # or
-npm i tappt
+npm i @mxerf/tappt
 # or
-pnpm add tappt
+pnpm add @mxerf/tappt
 ```
 
 React and Vue are declared as **optional peer dependencies** — you only need them installed if you import `tappt/react` or `tappt/vue`.
@@ -35,7 +35,7 @@ React and Vue are declared as **optional peer dependencies** — you only need t
 ### Vanilla
 
 ```ts
-import { haptic } from "tappt";
+import { haptic } from "@mxerf/tappt";
 
 button.addEventListener("click", () => haptic.impact("medium"));
 form.addEventListener("submit", () => haptic.notify("success"));
@@ -45,7 +45,7 @@ tabs.addEventListener("change", () => haptic.selection());
 Or use the named functions directly:
 
 ```ts
-import { impact, notify, selection } from "tappt";
+import { impact, notify, selection } from "@mxerf/tappt";
 
 impact("light");
 notify("error");
@@ -57,7 +57,7 @@ selection();
 Useful when you want to pass the haptic intent through component props:
 
 ```ts
-import { trigger, type HapticEvent } from "tappt";
+import { trigger, type HapticEvent } from "@mxerf/tappt";
 
 function handleAction(event: HapticEvent) {
   trigger(event);
@@ -73,7 +73,7 @@ handleAction({ kind: "selection" });
 For tests, per-feature opt-outs, or forced backends:
 
 ```ts
-import { createHaptic } from "tappt";
+import { createHaptic } from "@mxerf/tappt";
 
 const haptic = createHaptic({
   backend: "vibration", // force a specific backend
@@ -87,7 +87,7 @@ haptic.destroy(); // releases the iOS rig and internal state
 ### React
 
 ```tsx
-import { useHaptic, TapptProvider } from "tappt/react";
+import { useHaptic, TapptProvider } from "@mxerf/tappt/react";
 
 function LikeButton() {
   const haptic = useHaptic();
@@ -110,7 +110,7 @@ Without a provider, `useHaptic()` returns a shared module-level singleton — ze
 
 ```vue
 <script setup lang="ts">
-import { useHaptic } from "tappt/vue";
+import { useHaptic } from "@mxerf/tappt/vue";
 
 const haptic = useHaptic();
 </script>
@@ -124,7 +124,7 @@ Install as a plugin to inject an app-wide instance:
 
 ```ts
 import { createApp } from "vue";
-import { tapptPlugin } from "tappt/vue";
+import { tapptPlugin } from "@mxerf/tappt/vue";
 
 createApp(App).use(tapptPlugin({ disabled: false })).mount("#app");
 ```

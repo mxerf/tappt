@@ -1,5 +1,5 @@
 {
-  "name": "tappt",
+  "name": "@mxerf/tappt",
   "version": "0.1.0",
   "description": "Tiny, SSR-safe haptic feedback for the web. Works in Telegram Mini Apps, iOS Safari 17.4+ (Taptic Engine via the switch hack), and anywhere the Vibration API is available. Framework adapters for React and Vue.",
   "keywords": [
@@ -89,7 +89,6 @@
     "vue": "^3.5.13"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }
