@@ -1,0 +1,11 @@
+src
+tests
+node_modules
+coverage
+.github
+.changeset
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+bunfig.toml
+.gitignore
