@@ -4,15 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
-    <title>tappt — haptic feedback playground</title>
-    <meta name="description" content="Try @mxerf/tappt haptic feedback on your phone. Works in Telegram Mini Apps, iOS Safari 17.4+, and Android via the Vibration API." />
+    <title>tappt — haptic feedback for the web</title>
+    <meta name="description" content="Tiny SSR-safe haptic feedback for the web. Works in Telegram Mini Apps, iOS Safari 17.4+, and Android via the Vibration API." />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main>
       <header>
-        <h1>tappt</h1>
-        <p class="tagline">Tiny, SSR-safe haptic feedback for the web.</p>
+        <div class="brand">
+          <h1>tappt</h1>
+          <div class="lang" role="group" aria-label="Language">
+            <button type="button" data-lang="en" class="lang-btn is-active">EN</button>
+            <button type="button" data-lang="ru" class="lang-btn">RU</button>
+          </div>
+        </div>
+        <p class="tagline" data-i18n="tagline"></p>
         <nav class="links">
           <a href="https://www.npmjs.com/package/@mxerf/tappt" target="_blank" rel="noopener">npm</a>
           <span class="sep">·</span>
@@ -20,52 +26,113 @@
         </nav>
       </header>
 
-      <section class="status" id="status">
-        <div class="row"><span>Active backend</span><strong id="backend">…</strong></div>
-        <div class="row"><span>Package</span><strong id="version">@mxerf/tappt@…</strong></div>
-        <div class="row"><span>Telegram WebApp</span><strong id="has-tg">…</strong></div>
-        <div class="row"><span>iOS switch element</span><strong id="has-switch">…</strong></div>
-        <div class="row"><span>navigator.vibrate</span><strong id="has-vibrate">…</strong></div>
+      <section class="card status" aria-labelledby="env-title">
+        <h2 id="env-title" data-i18n="section.env"></h2>
+        <div class="row"><span data-i18n="env.backend"></span><strong id="backend">…</strong></div>
+        <div class="row"><span data-i18n="env.version"></span><strong id="version">@mxerf/tappt@…</strong></div>
+        <div class="row"><span data-i18n="env.tg"></span><strong id="has-tg">…</strong></div>
+        <div class="row"><span data-i18n="env.switch"></span><strong id="has-switch">…</strong></div>
+        <div class="row"><span data-i18n="env.vibrate"></span><strong id="has-vibrate">…</strong></div>
       </section>
 
-      <section>
-        <h2>Impact</h2>
-        <p class="hint">Short taps — great for buttons, toggles, drag endpoints.</p>
-        <div class="buttons">
-          <button data-kind="impact" data-style="light">Light</button>
-          <button data-kind="impact" data-style="medium">Medium</button>
-          <button data-kind="impact" data-style="heavy">Heavy</button>
-          <button data-kind="impact" data-style="rigid">Rigid</button>
-          <button data-kind="impact" data-style="soft">Soft</button>
+      <section aria-labelledby="try-title">
+        <h2 id="try-title" data-i18n="section.try"></h2>
+        <p class="hint" data-i18n="try.hint"></p>
+
+        <div class="group" data-group="impact">
+          <div class="group-head">
+            <h3>Impact</h3>
+            <p class="group-hint" data-i18n="group.impact"></p>
+          </div>
+          <div class="buttons">
+            <button data-kind="impact" data-style="light">Light</button>
+            <button data-kind="impact" data-style="medium">Medium</button>
+            <button data-kind="impact" data-style="heavy">Heavy</button>
+            <button data-kind="impact" data-style="rigid">Rigid</button>
+            <button data-kind="impact" data-style="soft">Soft</button>
+          </div>
+          <p class="note" id="impact-note" hidden data-i18n="impact.note"></p>
+        </div>
+
+        <div class="group" data-group="notify">
+          <div class="group-head">
+            <h3>Notify</h3>
+            <p class="group-hint" data-i18n="group.notify"></p>
+          </div>
+          <div class="buttons">
+            <button data-kind="notify" data-type="success">Success</button>
+            <button data-kind="notify" data-type="warning">Warning</button>
+            <button data-kind="notify" data-type="error">Error</button>
+          </div>
+        </div>
+
+        <div class="group" data-group="selection">
+          <div class="group-head">
+            <h3>Selection</h3>
+            <p class="group-hint" data-i18n="group.selection"></p>
+          </div>
+          <div class="buttons">
+            <button data-kind="selection">Selection</button>
+          </div>
         </div>
       </section>
 
-      <section>
-        <h2>Notification</h2>
-        <p class="hint">Event feedback — form success, errors, warnings.</p>
-        <div class="buttons">
-          <button data-kind="notify" data-type="success">Success</button>
-          <button data-kind="notify" data-type="warning">Warning</button>
-          <button data-kind="notify" data-type="error">Error</button>
+      <section aria-labelledby="install-title">
+        <h2 id="install-title" data-i18n="section.install"></h2>
+        <div class="install">
+          <div class="tabs" role="tablist">
+            <button type="button" class="tab is-active" data-pm="bun" role="tab">bun</button>
+            <button type="button" class="tab" data-pm="npm" role="tab">npm</button>
+            <button type="button" class="tab" data-pm="pnpm" role="tab">pnpm</button>
+            <button type="button" class="tab" data-pm="yarn" role="tab">yarn</button>
+          </div>
+          <div class="code-row">
+            <pre class="code"><code id="install-code">bun add @mxerf/tappt</code></pre>
+            <button type="button" id="copy-install" class="copy" aria-label="Copy" data-i18n-aria="copy.aria">
+              <span data-i18n="copy.idle"></span>
+            </button>
+          </div>
         </div>
       </section>
 
-      <section>
-        <h2>Selection</h2>
-        <p class="hint">Very light tap — tab switches, picker steps.</p>
-        <div class="buttons">
-          <button data-kind="selection">Selection</button>
-        </div>
+      <section aria-labelledby="api-title">
+        <h2 id="api-title" data-i18n="section.api"></h2>
+        <pre class="code"><code data-i18n="api.snippet"></code></pre>
+        <ul class="api-list">
+          <li><code>impact(style?)</code> — <span data-i18n="api.impact"></span></li>
+          <li><code>notify(type?)</code> — <span data-i18n="api.notify"></span></li>
+          <li><code>selection()</code> — <span data-i18n="api.selection"></span></li>
+          <li><code>trigger(event)</code> — <span data-i18n="api.trigger"></span></li>
+          <li><code>getBackend()</code> — <span data-i18n="api.getBackend"></span></li>
+          <li><code>isSupported()</code> — <span data-i18n="api.isSupported"></span></li>
+          <li><code>destroy()</code> — <span data-i18n="api.destroy"></span></li>
+        </ul>
       </section>
 
-      <section>
-        <h2>Install</h2>
-        <pre><code>bun add @mxerf/tappt</code></pre>
+      <section aria-labelledby="backends-title">
+        <h2 id="backends-title" data-i18n="section.backends"></h2>
+        <p class="hint" data-i18n="backends.hint"></p>
+        <ol class="api-list">
+          <li><code>telegram</code> — <span data-i18n="backend.telegram"></span></li>
+          <li><code>ios-switch</code> — <span data-i18n="backend.iosSwitch"></span></li>
+          <li><code>vibration</code> — <span data-i18n="backend.vibration"></span></li>
+          <li><code>noop</code> — <span data-i18n="backend.noop"></span></li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="limits-title">
+        <h2 id="limits-title" data-i18n="section.limits"></h2>
+        <ul class="api-list">
+          <li data-i18n="limit.iosImpact"></li>
+          <li data-i18n="limit.androidVary"></li>
+          <li data-i18n="limit.notifyQueue"></li>
+          <li data-i18n="limit.userGesture"></li>
+        </ul>
       </section>
 
       <footer>
-        <p>Open this page on a real phone for actual haptics.</p>
-        <p class="muted">Best results inside Telegram Mini App or iOS Safari 17.4+.</p>
+        <p data-i18n="footer.touch"></p>
+        <p class="muted" data-i18n="footer.best"></p>
       </footer>
     </main>
     <script type="module" src="./app.js"></script>

@@ -188,6 +188,29 @@ Pass `backend: "..."` to `createHaptic()` to force a specific one (e.g. skip Tel
 
 Every API is safe to import on the server. Backend detection is lazy and only runs when you actually call `impact() / notify() / selection() / trigger()` — so you can share a module-level `const haptic = createHaptic()` between client and server without guarding it.
 
+## Capability matrix
+
+Not every backend supports every intensity. `tappt` always calls something, but what the user feels depends on the platform:
+
+| Method              | Telegram Mini App | iOS Safari 17.4+ (`ios-switch`) | Android / Vibration API      | Noop |
+| ------------------- | ----------------- | ------------------------------- | ---------------------------- | ---- |
+| `impact("light")`   | Distinct          | Single pulse (style ignored)    | 8 ms vibrate                 | —    |
+| `impact("medium")`  | Distinct          | Single pulse (style ignored)    | 15 ms vibrate                | —    |
+| `impact("heavy")`   | Distinct          | Single pulse (style ignored)    | 25 ms vibrate                | —    |
+| `impact("rigid")`   | Distinct          | Single pulse (style ignored)    | 25 ms vibrate                | —    |
+| `impact("soft")`    | Distinct          | Single pulse (style ignored)    | 8 ms vibrate                 | —    |
+| `notify("success")` | Distinct          | 2 pulses                        | `[12, 40, 12]` pattern       | —    |
+| `notify("warning")` | Distinct          | 2 pulses                        | `[10, 40, 10]` pattern       | —    |
+| `notify("error")`   | Distinct          | 3 pulses                        | `[10, 60, 10, 60, 10]`       | —    |
+| `selection()`       | Distinct          | Single pulse                    | 5 ms vibrate                 | —    |
+
+## Known limitations
+
+- **iOS Safari cannot differentiate `impact` styles.** The `<input type="checkbox" switch>` element gives you exactly one kind of Taptic pulse — there is no public iOS web API that exposes the full `UIImpactFeedbackGenerator` surface. `impact("light")` and `impact("heavy")` feel identical in Safari. Inside a Telegram Mini App on iOS they are distinct, because the TG client forwards the intent natively.
+- **Android Vibration API varies wildly by device.** Some phones clip short vibrations below 10 ms, others ignore patterns entirely when battery saver is on. Don't encode meaning into small duration differences — design your UX so that *any* buzz means "something happened."
+- **`notify()` on iOS Safari is approximated by repeating pulses.** The timing gap is 55 ms. If you call `notify` twice in quick succession, they serialise through an internal queue so pulses don't interleave.
+- **`navigator.vibrate` requires a user gesture** in most browsers. `tappt` doesn't try to work around this — call haptic methods from real click/touch handlers.
+
 ## Browser support
 
 - Telegram Mini Apps (iOS + Android)
