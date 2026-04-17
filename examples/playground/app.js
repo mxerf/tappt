@@ -306,14 +306,15 @@ function applyBackendVisibility(backendName) {
   }
 }
 
-async function loadVersion() {
+async function fetchLatestVersion() {
   try {
     const res = await fetch(VERSION_PROBE, { cache: "no-store" });
-    if (res.ok) {
-      const pkg = await res.json();
-      setText("version", `@mxerf/tappt@${pkg.version}`);
-    }
-  } catch {}
+    if (!res.ok) return null;
+    const pkg = await res.json();
+    return typeof pkg.version === "string" ? pkg.version : null;
+  } catch {
+    return null;
+  }
 }
 
 function updateEnvCard(haptic) {
@@ -340,10 +341,16 @@ async function boot() {
   bindInstallTabs();
   bindCopy();
   bindPressFeedback();
-  loadVersion();
 
   try {
-    const { createHaptic } = await import("https://esm.sh/@mxerf/tappt");
+    // Pin to the exact latest version so esm.sh returns an immutable response
+    // (no CDN/browser cache lag between npm publish and the playground).
+    const version = await fetchLatestVersion();
+    const specifier = version
+      ? `https://esm.sh/@mxerf/tappt@${version}`
+      : "https://esm.sh/@mxerf/tappt";
+    if (version) setText("version", `@mxerf/tappt@${version}`);
+    const { createHaptic } = await import(specifier);
     const haptic = createHaptic();
     updateEnvCard(haptic);
     applyBackendVisibility(haptic.getBackend());
