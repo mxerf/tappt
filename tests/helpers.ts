@@ -7,9 +7,12 @@ export function mockTelegramWebApp() {
     selection: vi.fn(),
   };
   (window as unknown as {
-    Telegram: { WebApp: { HapticFeedback: unknown } };
+    Telegram: { WebApp: unknown };
   }).Telegram = {
     WebApp: {
+      initData: "query_id=TEST&user=%7B%22id%22%3A1%7D",
+      platform: "ios",
+      version: "7.6",
       HapticFeedback: {
         impactOccurred: spy.impact,
         notificationOccurred: spy.notify,
@@ -18,6 +21,24 @@ export function mockTelegramWebApp() {
     },
   };
   return spy;
+}
+
+/** Mount the public telegram-web-app.js stub-like object — no initData, platform=unknown. */
+export function mockTelegramStub() {
+  (window as unknown as {
+    Telegram: { WebApp: unknown };
+  }).Telegram = {
+    WebApp: {
+      initData: "",
+      platform: "unknown",
+      version: "6.0",
+      HapticFeedback: {
+        impactOccurred: vi.fn(),
+        notificationOccurred: vi.fn(),
+        selectionChanged: vi.fn(),
+      },
+    },
+  };
 }
 
 export function clearTelegram() {

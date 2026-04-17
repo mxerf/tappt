@@ -9,16 +9,39 @@ interface TelegramHapticFeedback {
 
 interface TelegramWebApp {
   HapticFeedback?: TelegramHapticFeedback;
+  initData?: string;
+  platform?: string;
+  version?: string;
 }
 
 interface WindowWithTelegram {
   Telegram?: { WebApp?: TelegramWebApp };
 }
 
+// Platforms the official Telegram clients identify themselves as. Anything
+// outside this set (e.g. "unknown" from the public telegram-web-app.js stub
+// loaded on a plain website) means we are NOT inside a real Mini App.
+const REAL_TG_PLATFORMS = new Set([
+  "android",
+  "android_x",
+  "ios",
+  "macos",
+  "tdesktop",
+  "weba",
+  "webk",
+]);
+
+function isRealMiniApp(tg: TelegramWebApp): boolean {
+  if (typeof tg.initData === "string" && tg.initData.length > 0) return true;
+  if (typeof tg.platform === "string" && REAL_TG_PLATFORMS.has(tg.platform)) return true;
+  return false;
+}
+
 function getFeedback(): TelegramHapticFeedback | null {
   if (!hasWindow()) return null;
   const tg = (window as unknown as WindowWithTelegram).Telegram?.WebApp;
-  const fb = tg?.HapticFeedback;
+  if (!tg || !isRealMiniApp(tg)) return null;
+  const fb = tg.HapticFeedback;
   if (!fb) return null;
   if (
     typeof fb.impactOccurred !== "function" ||

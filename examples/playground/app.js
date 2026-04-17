@@ -1,8 +1,14 @@
-import { createHaptic } from "https://esm.sh/@mxerf/tappt";
-
 const VERSION_PROBE = "https://esm.sh/@mxerf/tappt/package.json";
 
-const haptic = createHaptic();
+const REAL_TG_PLATFORMS = new Set([
+  "android",
+  "android_x",
+  "ios",
+  "macos",
+  "tdesktop",
+  "weba",
+  "webk",
+]);
 
 function text(id, value) {
   const el = document.getElementById(id);
@@ -16,35 +22,34 @@ function flag(id, condition) {
   el.dataset.state = condition ? "yes" : "no";
 }
 
-function detectBackend() {
-  // Mirrors the library's own priority so the status card reflects reality
-  // without having to call haptic first.
-  const tg = typeof window !== "undefined" && window.Telegram?.WebApp?.HapticFeedback;
-  if (tg) return "telegram";
-  const hasSwitch =
-    typeof HTMLInputElement !== "undefined" &&
-    "switch" in HTMLInputElement.prototype;
-  if (hasSwitch) return "ios-switch";
-  if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-    return "vibration";
+function isRealTg() {
+  const tg = window.Telegram && window.Telegram.WebApp;
+  if (!tg || !tg.HapticFeedback) return false;
+  if (typeof tg.initData === "string" && tg.initData.length > 0) return true;
+  if (typeof tg.platform === "string" && REAL_TG_PLATFORMS.has(tg.platform)) {
+    return true;
   }
-  return "noop";
+  return false;
 }
 
-async function renderStatus() {
-  const backend = haptic.getBackend();
-  text("backend", backend);
-
-  flag("has-tg", !!window.Telegram?.WebApp?.HapticFeedback);
-  flag(
-    "has-switch",
+function hasIosSwitch() {
+  return (
     typeof HTMLInputElement !== "undefined" &&
-      "switch" in HTMLInputElement.prototype,
+    "switch" in HTMLInputElement.prototype
   );
-  flag(
-    "has-vibrate",
-    typeof navigator !== "undefined" && typeof navigator.vibrate === "function",
+}
+
+function hasVibrate() {
+  return (
+    typeof navigator !== "undefined" && typeof navigator.vibrate === "function"
   );
+}
+
+async function renderStatus(haptic) {
+  flag("has-tg", isRealTg());
+  flag("has-switch", hasIosSwitch());
+  flag("has-vibrate", hasVibrate());
+  text("backend", haptic ? haptic.getBackend() : "—");
 
   try {
     const res = await fetch(VERSION_PROBE, { cache: "no-store" });
@@ -59,7 +64,7 @@ async function renderStatus() {
   }
 }
 
-function bindButtons() {
+function bindButtons(haptic) {
   document.querySelectorAll("button[data-kind]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const kind = btn.dataset.kind;
@@ -70,18 +75,27 @@ function bindButtons() {
       } else if (kind === "selection") {
         haptic.selection();
       }
-      // Refresh the backend label — first call may have resolved it lazily.
       text("backend", haptic.getBackend());
     });
   });
 }
 
-// Let TG's JS bootstrap attach window.Telegram before we probe — telegram-web-app.js
-// attaches synchronously, but we wait a tick for safety.
-queueMicrotask(() => {
-  // Pre-warm backend resolution so the status card is accurate immediately.
-  const prewarm = detectBackend();
-  text("backend", prewarm);
-  renderStatus();
-  bindButtons();
-});
+function showLoadError(err) {
+  text("backend", "load-error");
+  const details = document.createElement("pre");
+  details.className = "error";
+  details.textContent = `Failed to load @mxerf/tappt from esm.sh\n\n${err?.message ?? err}`;
+  document.querySelector("main")?.prepend(details);
+}
+
+(async () => {
+  try {
+    const { createHaptic } = await import("https://esm.sh/@mxerf/tappt");
+    const haptic = createHaptic();
+    await renderStatus(haptic);
+    bindButtons(haptic);
+  } catch (err) {
+    console.error(err);
+    showLoadError(err);
+  }
+})();

@@ -5,6 +5,7 @@ import {
   clearIosSwitch,
   clearVibrate,
   mockTelegramWebApp,
+  mockTelegramStub,
   mockIosSwitch,
   mockVibrate,
   resetHapticState,
@@ -93,6 +94,19 @@ describe("telegram backend", () => {
     });
     const h = createHaptic();
     expect(() => h.impact()).not.toThrow();
+  });
+
+  it("ignores the public telegram-web-app.js stub (no real Mini App)", () => {
+    // A plain website that loads telegram-web-app.js gets a window.Telegram
+    // with empty initData and platform=unknown. We must NOT pick the telegram
+    // backend in that case.
+    mockTelegramStub();
+    clearIosSwitch();
+    const vib = mockVibrate();
+    const h = createHaptic();
+    h.impact("medium");
+    expect(h.getBackend()).toBe("vibration");
+    expect(vib).toHaveBeenCalled();
   });
 });
 
