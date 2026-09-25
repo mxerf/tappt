@@ -1,7 +1,8 @@
-import { createContext, createElement, useContext, useRef, useEffect } from "react";
-import type { ReactNode } from "react";
+import { createContext, createElement, useCallback, useContext, useRef, useEffect } from "react";
+import type { ReactNode, RefCallback } from "react";
+import { hapticEventKey } from "../core/event-key";
 import { createHaptic, haptic as sharedHaptic } from "../core/haplib";
-import type { Haptic, HapticOptions } from "../core/types";
+import type { Haptic, HapticEvent, HapticOptions } from "../core/types";
 
 const HapticContext = createContext<Haptic | null>(null);
 
@@ -57,6 +58,28 @@ export function TapptProvider(props: TapptProviderProps) {
 export function useHaptic(): Haptic {
   const ctx = useContext(HapticContext);
   return ctx ?? sharedHaptic;
+}
+
+/**
+ * Ref callback that attaches its element to the nearest haptic instance
+ * (see `Haptic.attach`). Needed for haptics on iOS Safari 26.5+: put it on
+ * the element whose click handlers call haptic methods, or pass `event` to
+ * fire it on every tap. An inline event literal does not re-attach on render.
+ */
+export function useHapticRef<T extends HTMLElement = HTMLElement>(event?: HapticEvent): RefCallback<T> {
+  const haptic = useHaptic();
+  const detachRef = useRef<(() => void) | null>(null);
+  const eventKey = hapticEventKey(event);
+
+  // `event` is fully described by `eventKey`, so the callback only changes
+  // when the event does.
+  return useCallback(
+    (element: T | null) => {
+      detachRef.current?.();
+      detachRef.current = element ? haptic.attach(element, event) : null;
+    },
+    [haptic, eventKey],
+  );
 }
 
 export type { Haptic, HapticOptions, HapticEvent, ImpactStyle, NotificationType, BackendName } from "../core/types";

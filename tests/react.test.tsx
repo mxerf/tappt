@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { act, StrictMode } from "react";
+import { act, StrictMode, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { TapptProvider, useHaptic } from "../src/react";
+import { TapptProvider, useHaptic, useHapticRef } from "../src/react";
 import { createHaptic } from "../src/core/haplib";
-import { mockTelegramWebApp, resetHapticState } from "./helpers";
+import { mockIosSwitch, mockTelegramWebApp, resetHapticState } from "./helpers";
 
 beforeEach(() => resetHapticState());
 afterEach(() => resetHapticState());
@@ -84,6 +84,70 @@ describe("React adapter", () => {
     expect(last.isSupported()).toBe(true);
     last.impact("medium");
     expect(tg.impact).toHaveBeenLastCalledWith("medium");
+    act(() => root.unmount());
+  });
+});
+
+describe("useHapticRef", () => {
+  const overlayIn = (el: Element | null) => el?.querySelector("label[data-tappt-overlay]") ?? null;
+  // happy-dom delivers MutationObserver records on a timer, not a microtask.
+  const flushMutations = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  it("attaches the element on mount and releases it on unmount", () => {
+    mockIosSwitch();
+    function Tap() {
+      return <button ref={useHapticRef<HTMLButtonElement>()}>Tap</button>;
+    }
+    const { root, container } = render(
+      <TapptProvider>
+        <Tap />
+      </TapptProvider>,
+    );
+    const button = container.querySelector("button");
+    expect(overlayIn(button)).not.toBeNull();
+
+    act(() => root.unmount());
+    expect(overlayIn(button)).toBeNull();
+  });
+
+  it("keeps one attachment across re-renders of an inline event literal", async () => {
+    mockIosSwitch();
+    let setCount: (count: number) => void = () => {};
+    function Counter() {
+      const [count, set] = useState(0);
+      setCount = set;
+      return <button ref={useHapticRef({ kind: "impact", style: "light" })}>{count}</button>;
+    }
+    const { root, container } = render(
+      <TapptProvider>
+        <Counter />
+      </TapptProvider>,
+    );
+    const button = container.querySelector("button");
+    const overlay = overlayIn(button);
+    expect(overlay).not.toBeNull();
+
+    act(() => setCount(1));
+    await flushMutations();
+
+    expect(button?.textContent).toBe("1");
+    expect(overlayIn(button)).toBe(overlay);
+    act(() => root.unmount());
+  });
+
+  it("fires the declared event through the provider's instance", () => {
+    const tg = mockTelegramWebApp();
+    function Tap() {
+      return <button ref={useHapticRef({ kind: "impact", style: "heavy" })}>Tap</button>;
+    }
+    const { root, container } = render(
+      <TapptProvider>
+        <Tap />
+      </TapptProvider>,
+    );
+
+    act(() => container.querySelector("button")?.click());
+    expect(tg.impact).toHaveBeenCalledWith("heavy");
     act(() => root.unmount());
   });
 });
