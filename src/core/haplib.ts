@@ -40,11 +40,27 @@ function pickBackend(preferred?: BackendName): Backend {
 export function createHaptic(options: HapticOptions = {}): Haptic {
   let resolved: Backend | null = null;
   let destroyed = false;
+  const detachers = new Set<() => void>();
 
   const resolve = (): Backend => {
     if (destroyed || options.disabled) return noopBackend;
     if (!resolved) resolved = pickBackend(options.backend);
     return resolved;
+  };
+
+  const trigger = (event: HapticEvent): void => {
+    const b = resolve();
+    switch (event.kind) {
+      case "impact":
+        b.impact(event.style ?? "light");
+        return;
+      case "notification":
+        b.notify(event.type ?? "success");
+        return;
+      case "selection":
+        b.selection();
+        return;
+    }
   };
 
   return {
@@ -57,19 +73,20 @@ export function createHaptic(options: HapticOptions = {}): Haptic {
     selection() {
       resolve().selection();
     },
-    trigger(event: HapticEvent) {
-      const b = resolve();
-      switch (event.kind) {
-        case "impact":
-          b.impact(event.style ?? "light");
-          return;
-        case "notification":
-          b.notify(event.type ?? "success");
-          return;
-        case "selection":
-          b.selection();
-          return;
-      }
+    trigger,
+    attach(element: HTMLElement, event?: HapticEvent) {
+      const backend = resolve();
+      if (backend === noopBackend) return () => {};
+      const unbind = backend.bind?.(element);
+      const onClick = event ? () => trigger(event) : null;
+      if (onClick) element.addEventListener("click", onClick);
+      const detach = () => {
+        if (!detachers.delete(detach)) return;
+        unbind?.();
+        if (onClick) element.removeEventListener("click", onClick);
+      };
+      detachers.add(detach);
+      return detach;
     },
     getBackend() {
       return resolve().name;
@@ -80,6 +97,7 @@ export function createHaptic(options: HapticOptions = {}): Haptic {
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      for (const detach of [...detachers]) detach();
       if (resolved?.destroy) resolved.destroy();
       resolved = null;
     },
@@ -107,4 +125,8 @@ export function selection(): void {
 
 export function trigger(event: HapticEvent): void {
   haptic.trigger(event);
+}
+
+export function attach(element: HTMLElement, event?: HapticEvent): () => void {
+  return haptic.attach(element, event);
 }

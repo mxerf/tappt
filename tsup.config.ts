@@ -11,7 +11,7 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
-  splitting: false,
+  splitting: true,
   minify: true,
   target: "es2020",
   external: ["react", "vue"],

@@ -14,6 +14,12 @@ export interface Backend {
   impact(style: ImpactStyle): void;
   notify(type: NotificationType): void;
   selection(): void;
+  /**
+   * Prepare `element` so that a real tap on it can carry a haptic. Haptic
+   * calls made while that tap's click is dispatched on the element ride on
+   * it. Returns a function that undoes the preparation.
+   */
+  bind?(element: HTMLElement): () => void;
   destroy?(): void;
 }
 
@@ -35,11 +41,22 @@ export interface Haptic {
   notify(type?: NotificationType): void;
   selection(): void;
   trigger(event: HapticEvent): void;
+  /**
+   * Make taps on `element` able to produce haptics everywhere, including iOS
+   * Safari 26.5+, where only a finger on a real switch fires the Taptic
+   * Engine. Haptic calls made in the element's click handlers ride on the
+   * tap; pass `event` to fire it on every tap without writing a handler.
+   * Returns a function that detaches the element.
+   */
+  attach(element: HTMLElement, event?: HapticEvent): () => void;
 
   /** Which backend is active. Resolved lazily on first use. */
   getBackend(): BackendName;
   /** Whether any real backend is available (false means no-op). */
   isSupported(): boolean;
-  /** Release DOM nodes and internal state. Safe to call multiple times. */
+  /**
+   * Release DOM nodes, attached elements and internal state. Safe to call
+   * multiple times.
+   */
   destroy(): void;
 }

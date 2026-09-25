@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { createApp, defineComponent, h } from "vue";
-import { tapptPlugin, useHaptic } from "../src/vue";
-import { mockTelegramWebApp, resetHapticState } from "./helpers";
+import { createApp, defineComponent, h, nextTick, ref, resolveDirective, withDirectives } from "vue";
+import { tapptPlugin, useHaptic, vHaptic } from "../src/vue";
+import { mockIosSwitch, mockTelegramWebApp, resetHapticState } from "./helpers";
+import type { ImpactStyle } from "../src/core/types";
 
 beforeEach(() => resetHapticState());
 afterEach(() => resetHapticState());
@@ -62,6 +63,52 @@ describe("Vue adapter", () => {
     document.body.appendChild(el);
     app.mount(el);
     expect(instances[0]).not.toBe(instances[1]);
+    app.unmount();
+  });
+});
+
+describe("v-haptic", () => {
+  function mount(app: ReturnType<typeof createApp>): HTMLElement {
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    app.mount(el);
+    return el;
+  }
+
+  it("attaches through the plugin's instance and releases on unmount", () => {
+    mockIosSwitch();
+    const Tap = defineComponent({
+      setup() {
+        const haptic = resolveDirective("haptic");
+        return () => withDirectives(h("button", "Tap"), haptic ? [[haptic]] : []);
+      },
+    });
+    const app = createApp(Tap).use(tapptPlugin());
+    const root = mount(app);
+    const button = root.querySelector("button");
+    expect(button?.querySelector("label[data-tappt-overlay]")).not.toBeNull();
+
+    app.unmount();
+    expect(button?.querySelector("label[data-tappt-overlay]")).toBeNull();
+  });
+
+  it("fires the declared event and follows its changes", async () => {
+    const tg = mockTelegramWebApp();
+    const style = ref<ImpactStyle>("light");
+    const Tap = defineComponent({
+      setup() {
+        return () => withDirectives(h("button", "Tap"), [[vHaptic, { kind: "impact", style: style.value }]]);
+      },
+    });
+    const app = createApp(Tap);
+    const button = mount(app).querySelector("button");
+
+    button?.click();
+    style.value = "heavy";
+    await nextTick();
+    button?.click();
+
+    expect(tg.impact.mock.calls).toEqual([["light"], ["heavy"]]);
     app.unmount();
   });
 });
