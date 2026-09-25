@@ -1,5 +1,6 @@
 export * from "./types";
 export {
+  attach,
   createHaptic,
   haptic,
   impact,
