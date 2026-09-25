@@ -100,6 +100,12 @@ function mountOverlay(host: HTMLElement, onTap: (event: MouseEvent) => void): ()
   });
   label.appendChild(input);
 
+  // React and Vue update a text-only element through `textContent`, which
+  // drops every child, the overlay included: put it back.
+  const keeper = new MutationObserver(() => {
+    if (label.parentNode !== host) host.appendChild(label);
+  });
+
   const previousPosition = host.style.position;
   let repositioned = false;
   let frame: number | null = null;
@@ -117,11 +123,13 @@ function mountOverlay(host: HTMLElement, onTap: (event: MouseEvent) => void): ()
       repositioned = true;
     }
     host.appendChild(label);
+    keeper.observe(host, { childList: true });
   };
   place();
 
   return () => {
     if (frame !== null) cancelAnimationFrame(frame);
+    keeper.disconnect();
     label.remove();
     if (repositioned) host.style.position = previousPosition;
   };

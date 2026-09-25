@@ -241,6 +241,23 @@ describe("attach() on ios-switch", () => {
     expect(overlayOf(host)).toBeNull();
   });
 
+  it("puts the overlay back when the host's text is rewritten", async () => {
+    // happy-dom delivers MutationObserver records on a timer, not a microtask.
+    const flushMutations = () => new Promise((resolve) => setTimeout(resolve, 0));
+    const host = mountHost();
+    const detach = createHaptic().attach(host);
+
+    host.textContent = "Tapped";
+    await flushMutations();
+    expect(overlayOf(host)).not.toBeNull();
+    expect(host.textContent).toBe("Tapped");
+
+    detach();
+    host.textContent = "Again";
+    await flushMutations();
+    expect(overlayOf(host)).toBeNull();
+  });
+
   it("leaves an explicitly positioned host alone", () => {
     const host = mountHost();
     host.style.position = "absolute";
