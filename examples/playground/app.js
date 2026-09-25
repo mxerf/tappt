@@ -24,14 +24,15 @@ const DICT = {
     "copy.aria": "Copy install command",
     "section.api": "API",
     "api.snippet":
-      'import { haptic } from "@mxerf/tappt";\n\nhaptic.impact("medium");\nhaptic.notify("success");\nhaptic.selection();',
+      'import { haptic } from "@mxerf/tappt";\n\nhaptic.attach(button); // iOS 26.5+\nbutton.onclick = () => haptic.impact("medium");\n\nhaptic.notify("success");\nhaptic.selection();',
     "api.impact": "short tap — buttons, toggles, drag endpoints",
     "api.notify": "event feedback — form success, warning, error",
     "api.selection": "very light tap — tab switches, picker steps",
     "api.trigger": "dispatch a discriminated HapticEvent",
+    "api.attach": "let taps on an element carry haptics on iOS 26.5+",
     "api.getBackend": "which backend is active",
     "api.isSupported": "true if any real backend works",
-    "api.destroy": "release DOM rig and internal state",
+    "api.destroy": "release DOM rig, attached elements and internal state",
     "section.backends": "Backend priority",
     "backends.hint": "On first use tappt picks the first available backend:",
     "backend.telegram":
@@ -45,8 +46,10 @@ const DICT = {
       "iOS Safari cannot differentiate impact styles — all five feel the same.",
     "limit.androidVary":
       "Vibration API behaviour varies wildly between Android devices; don't encode meaning into small duration differences.",
+    "limit.ios265":
+      "On iOS 26.5+ haptics fire only from a tap on an attached element, and notify() gives a single pulse.",
     "limit.notifyQueue":
-      "notify() on iOS uses repeated pulses with a 55 ms gap; overlapping calls serialise via an internal queue.",
+      "notify() on iOS 17.4–26.4 uses repeated pulses with a 55 ms gap; overlapping calls serialise via an internal queue.",
     "limit.userGesture":
       "navigator.vibrate requires a real user gesture — call haptic methods from click/touch handlers.",
     "footer.touch": "Open this page on a real phone for actual haptics.",
@@ -73,14 +76,15 @@ const DICT = {
     "copy.aria": "Скопировать команду установки",
     "section.api": "API",
     "api.snippet":
-      'import { haptic } from "@mxerf/tappt";\n\nhaptic.impact("medium");\nhaptic.notify("success");\nhaptic.selection();',
+      'import { haptic } from "@mxerf/tappt";\n\nhaptic.attach(button); // iOS 26.5+\nbutton.onclick = () => haptic.impact("medium");\n\nhaptic.notify("success");\nhaptic.selection();',
     "api.impact": "короткий тап — кнопки, тумблеры, конец drag-жеста",
     "api.notify": "отклик на событие — успех, предупреждение, ошибка",
     "api.selection": "очень лёгкий тап — вкладки, шаги пикера",
     "api.trigger": "отправить HapticEvent (discriminated union)",
+    "api.attach": "чтобы тапы по элементу давали хаптик на iOS 26.5+",
     "api.getBackend": "какой бэкенд сейчас активен",
     "api.isSupported": "true, если хоть один бэкенд работает",
-    "api.destroy": "освободить DOM-элементы и внутреннее состояние",
+    "api.destroy": "освободить DOM-элементы, снять attach() и сбросить внутреннее состояние",
     "section.backends": "Приоритет бэкендов",
     "backends.hint":
       "При первом вызове tappt выбирает первый доступный из списка:",
@@ -97,8 +101,10 @@ const DICT = {
       "iOS Safari не различает стили impact — все пять ощущаются одинаково.",
     "limit.androidVary":
       "Поведение Vibration API сильно отличается от устройства к устройству, не полагайся на тонкие различия длительности.",
+    "limit.ios265":
+      "На iOS 26.5+ хаптик срабатывает только от тапа по элементу с attach(), а notify() даёт один пульс.",
     "limit.notifyQueue":
-      "На iOS notify() эмулируется серией пульсов с паузой 55 мс. Вызовы, идущие подряд, ставятся в очередь и не накладываются друг на друга.",
+      "На iOS 17.4–26.4 notify() эмулируется серией пульсов с паузой 55 мс. Вызовы, идущие подряд, ставятся в очередь и не накладываются друг на друга.",
     "limit.userGesture":
       "navigator.vibrate срабатывает только в ответ на действие пользователя — вызывай haptic из обработчиков click/touch.",
     "footer.touch": "Чтобы почувствовать вибрацию, открой страницу на реальном телефоне.",
@@ -367,6 +373,9 @@ async function boot() {
         }
         setText("backend", haptic.getBackend());
       });
+      // Optional call: the page loads the latest published tappt, which may
+      // predate attach().
+      haptic.attach?.(btn);
     });
   } catch (err) {
     console.error(err);
